@@ -116,7 +116,7 @@ public class Main {
         void addFirst (int data) {
             Node newNode = new Node();
             newNode.setData(data);
-            if (head == null) {//If it is the first element, it becomes both head and tail.
+            if (head == null) {//If it is the first element it becomes both head and tail.
                 head = newNode;
                 tail = newNode;
             }
