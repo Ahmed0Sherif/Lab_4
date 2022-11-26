@@ -94,18 +94,19 @@ interface ILinkedList {
 
             //TEST
             SingleLinkedList myLinkedList = new SingleLinkedList(first);
-            int i = 3;
+            // int i = 0;
 
-            Node newNode = new Node(4, null);
-            myLinkedList.add(i, newNode);
+            // Node newNode = new Node(4, null);
+            // myLinkedList.add(i, newNode);
 
-            Node currentNode = myLinkedList.get(2);
-            System.out.println(currentNode.data);
+            Node currentNode = Head;
+            // System.out.println(currentNode.data);
+            myLinkedList.set(3, new Node(15));
 
-            // while (currentNode != null) {
-            //     System.out.println(currentNode.data);
-            //     currentNode = currentNode.next;
-            // }
+            while (currentNode != null) {
+                System.out.println(currentNode.data);
+                currentNode = currentNode.next;
+            }
             
 
         }
@@ -168,8 +169,15 @@ interface ILinkedList {
 
         @Override
         public void set(int index, Node element) {
-            // TODO Auto-generated method stub
+            Node currentNode = Head;
+            int currentIndex = 0;
             
+            while (currentIndex < index) {
+                currentNode = currentNode.next;
+                currentIndex++;
+            }
+
+            currentNode.data = element.data;
         }
 
         @Override
