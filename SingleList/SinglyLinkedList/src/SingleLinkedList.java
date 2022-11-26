@@ -109,8 +109,10 @@ interface ILinkedList {
             //     System.out.println(currentNode.data);
             //     currentNode = currentNode.next;
             // }
-            SingleLinkedList subList = myLinkedList.sublist(2, 5);
-            subList.dispList();
+            // SingleLinkedList subList = myLinkedList.sublist(2, 5);
+            // subList.dispList();
+            Node targetNode = new Node(100);
+            System.out.println(myLinkedList.contains(targetNode));
 
         }
 
@@ -239,7 +241,14 @@ interface ILinkedList {
 
         @Override
         public boolean contains(Node o) {
-            // TODO Auto-generated method stub
+            Node currentNode = Head;
+            while(currentNode != null){
+                if (currentNode.data == o.data) {
+                    return true;
+                } else {
+                    currentNode = currentNode.next;
+                }
+            }
             return false;
         }
 
