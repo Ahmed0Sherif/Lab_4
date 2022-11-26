@@ -1,5 +1,7 @@
+import java.util.Arrays;
+import java.util.Scanner;
 
-    // CLASS TO REPRESENT A SINGLE NODE
+// CLASS TO REPRESENT A SINGLE NODE
     class Node {
         int data;
         Node next = null;
@@ -86,36 +88,71 @@ interface ILinkedList {
 
 
         public static void main(String[] args) {
-            /* Enter your code here. Read input from STDIN. Print output to STDOUT. */
 
-            Node fourth = new Node(4, null);
-            Node third = new Node(3, fourth);
-            Node second = new Node(2, third);
-            Node first = new Node(1, second);
+            SingleLinkedList myList = new SingleLinkedList(Head);
 
-            //TEST
-            SingleLinkedList myLinkedList = new SingleLinkedList(first);
-            // int i = 0;
+            //GET INPUT FROM USER
+            Scanner scan = new Scanner(System.in);
+            String strArr = scan.nextLine();
+            // String operation = scan.next();
 
-            // Node newNode = new Node(4, null);
-            // myLinkedList.add(i, newNode);
+            //GET LINKED LIST FROM INPUT
+            int[] values = myList.stringToIntArray(strArr);
+            myList.arrayToList(values);
 
+            myList.dispList();
             
-            // System.out.println(currentNode.data);
-            // myLinkedList.remove(2);
-            // Node currentNode = Head;
-
-            // while (currentNode != null) {
-            //     System.out.println(currentNode.data);
-            //     currentNode = currentNode.next;
-            // }
-            // SingleLinkedList subList = myLinkedList.sublist(2, 5);
-            // subList.dispList();
-            Node targetNode = new Node(100);
-            System.out.println(myLinkedList.contains(targetNode));
-
+        
+        
+            scan.close();
         }
 
+
+        public void arrayToList(int[] intArray) {
+
+            int len = intArray.length;
+            if (len == 0) {
+                return;
+            } else {
+                Node[] arrayOfNodes = new Node[len];
+                // LOOP TO SET VALUE OF EACH NODE
+                for (int i = 0; i < len; i++) {
+                    arrayOfNodes[i] = new Node(intArray[i]);
+                }
+
+                // LOOP TO SET POINTER OF EACH NODE
+                for (int i = 0; i < len; i++) {
+                    if (i == len-1) {
+                        arrayOfNodes[i].next = null;
+                    } else {
+                        arrayOfNodes[i].next = arrayOfNodes[i+1];
+                    }
+                    
+                }
+                Head = arrayOfNodes[0];
+
+            }
+            
+        }
+
+
+        public int[] stringToIntArray(String s){
+            if (s.equals("[]")) {
+                int[] output = new int[0];
+                return output;
+            } else {
+                String[] arrayOfStrings = s.trim().replace("[", "").replace("]", "").split(",");
+                int len = arrayOfStrings.length;
+                int[] output = new int[len];
+
+                for (int i = 0; i < len; i++) {
+                    output[i] = Integer.valueOf(arrayOfStrings[i].trim());
+                }
+                return output;
+
+            }
+            
+        }
         
 
         @Override
