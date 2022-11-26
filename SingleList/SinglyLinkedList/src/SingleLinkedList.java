@@ -101,13 +101,15 @@ interface ILinkedList {
 
             
             // System.out.println(currentNode.data);
-            myLinkedList.remove(2);
-            Node currentNode = Head;
+            // myLinkedList.remove(2);
+            // Node currentNode = Head;
 
-            while (currentNode != null) {
-                System.out.println(currentNode.data);
-                currentNode = currentNode.next;
-            }
+            // while (currentNode != null) {
+            //     System.out.println(currentNode.data);
+            //     currentNode = currentNode.next;
+            // }
+            myLinkedList.add(new Node());
+            System.out.println(myLinkedList.size());
             
 
         }
@@ -208,8 +210,13 @@ interface ILinkedList {
 
         @Override
         public int size() {
-            // TODO Auto-generated method stub
-            return 0;
+            Node currentNode = Head;
+            int size = 0;
+            while (currentNode != null) {
+                size++;
+                currentNode = currentNode.next;
+            }
+            return size;
         }
 
         @Override
