@@ -64,7 +64,7 @@ interface ILinkedList {
     * @param toIndex
     * @return a view of the portion of this list between the specified fromIndex and toIndex, inclusively.
     */
-    public ILinkedList sublist(int fromIndex, int toIndex);
+    public SingleLinkedList sublist(int fromIndex, int toIndex);
     /**
     * @param o
     * @return true if this list contains an element with the same value as the specified element.
@@ -88,7 +88,8 @@ interface ILinkedList {
         public static void main(String[] args) {
             /* Enter your code here. Read input from STDIN. Print output to STDOUT. */
 
-            Node third = new Node(3, null);
+            Node fourth = new Node(4, null);
+            Node third = new Node(3, fourth);
             Node second = new Node(2, third);
             Node first = new Node(1, second);
 
@@ -108,9 +109,8 @@ interface ILinkedList {
             //     System.out.println(currentNode.data);
             //     currentNode = currentNode.next;
             // }
-            myLinkedList.add(new Node());
-            System.out.println(myLinkedList.size());
-            
+            SingleLinkedList subList = myLinkedList.sublist(2, 5);
+            subList.dispList();
 
         }
 
@@ -220,15 +220,35 @@ interface ILinkedList {
         }
 
         @Override
-        public ILinkedList sublist(int fromIndex, int toIndex) {
-            // TODO Auto-generated method stub
-            return null;
+        public SingleLinkedList sublist(int fromIndex, int toIndex) {
+            Node startNode = get(fromIndex);
+            Node endNode = get(toIndex);
+
+            Node newStartNode = new Node(startNode.data);
+            SingleLinkedList resultList = new SingleLinkedList(newStartNode);
+            Node currentNode = startNode;
+
+            while (currentNode != endNode) {
+                currentNode = currentNode.next;
+                Node copyOfCurrentNode = new Node(currentNode.data);
+                resultList.add(copyOfCurrentNode);
+            }
+            
+            return resultList;
         }
 
         @Override
         public boolean contains(Node o) {
             // TODO Auto-generated method stub
             return false;
+        }
+
+        public void dispList() {
+            Node currentNode = Head;
+            while (currentNode != null) {
+                System.out.println(currentNode.data);
+                currentNode = currentNode.next;
+            }
         }
 
 
