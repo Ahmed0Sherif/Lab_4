@@ -99,9 +99,10 @@ interface ILinkedList {
             // Node newNode = new Node(4, null);
             // myLinkedList.add(i, newNode);
 
-            Node currentNode = Head;
+            
             // System.out.println(currentNode.data);
-            myLinkedList.set(3, new Node(15));
+            myLinkedList.remove(2);
+            Node currentNode = Head;
 
             while (currentNode != null) {
                 System.out.println(currentNode.data);
@@ -192,8 +193,17 @@ interface ILinkedList {
 
         @Override
         public void remove(int index) {
-            // TODO Auto-generated method stub
-            
+            if (index == 0) {
+                Node temp = Head;
+                Head = Head.next;
+                temp.next = null;
+            } else {
+                Node prevNode = get(index-1);
+                Node targetNode = prevNode.next;
+
+                prevNode.next = targetNode.next;
+                targetNode.next = null;
+            }            
         }
 
         @Override
