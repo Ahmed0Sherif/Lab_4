@@ -94,13 +94,93 @@ interface ILinkedList {
             //GET INPUT FROM USER
             Scanner scan = new Scanner(System.in);
             String strArr = scan.nextLine();
-            // String operation = scan.next();
+            String operation = scan.next();
 
             //GET LINKED LIST FROM INPUT
             int[] values = myList.stringToIntArray(strArr);
             myList.arrayToList(values);
 
-            myList.dispList();
+            switch (operation) {
+                case "add":
+                    int valueToAdd = scan.nextInt();
+                    Node nodeToAdd = new Node(valueToAdd);
+                    myList.add(nodeToAdd);
+                    myList.dispList();    
+                    break;
+                case "addToIndex":
+                    int indexToAdd = scan.nextInt();
+                    int valueToAddAtIndex = scan.nextInt();
+                    if (indexToAdd <0 || indexToAdd > myList.size()) {
+                        System.out.println("Error");
+                    } else {
+                        Node nodeToAddAtIndex = new Node(valueToAddAtIndex);
+                        myList.add(indexToAdd, nodeToAddAtIndex);
+                        myList.dispList();
+                    }
+                    break;
+                case "get":
+                    int indexToGet = scan.nextInt();
+                    if (indexToGet < 0 || indexToGet > myList.size()-1) {
+                        System.out.println("Error");
+                    } else {
+                        Node nodeToGet = myList.get(indexToGet);
+                        System.out.println(nodeToGet.data);
+                    }
+                    break;
+                case "set":
+                    int indexToSet = scan.nextInt();
+                    int valueToSet = scan.nextInt();
+                    if (indexToSet < 0 || indexToSet > myList.size()-1) {
+                        System.out.println("Error");
+                    } else {
+                        Node nodeToSet = new Node(valueToSet);
+                        myList.set(indexToSet, nodeToSet);
+                        myList.dispList();
+                    }
+                    break;
+                case "clear":
+                    myList.clear();
+                    myList.dispList();
+                    break;
+                case "isEmpty":
+                    System.out.println(myList.isEmpty());
+                    break;
+                case "remove":
+                    int indexToRemove = scan.nextInt();
+                    if (indexToRemove < 0 || indexToRemove > myList.size()-1) {
+                        System.out.println("Error");
+                    } else {
+                        myList.remove(indexToRemove);
+                        myList.dispList();
+                    }
+                    break;
+                case "sublist":
+                    int startIndex = scan.nextInt();
+                    int endIndex = scan.nextInt();
+                    // Booleans to check the validity of the starting index and the ending index
+                    boolean isStartIndexValid = startIndex >= 0 && startIndex < myList.size();
+                    boolean isEndINdexValid = endIndex >= 0 && endIndex < myList.size() && endIndex >= startIndex;
+                    // If the starting index is not valid or the ending index is not valid print "Error"
+                    if (!isStartIndexValid || !isEndINdexValid) {
+                        System.out.println("Error");
+                    } else {
+                        SingleLinkedList subList = myList.sublist(startIndex, endIndex);
+                        subList.dispList();
+                    }
+                    break;
+                case "contains":
+                    int valueToContain = scan.nextInt();
+                    Node nodeToContain = new Node(valueToContain);
+                    System.out.println(myList.contains(nodeToContain));
+                    break;
+                case "size":
+                    System.out.println(myList.size());
+                    break;    
+            
+                default:
+                    System.out.println("Error");
+                    break;
+            }
             
         
         
@@ -290,10 +370,17 @@ interface ILinkedList {
         }
 
         public void dispList() {
-            Node currentNode = Head;
-            while (currentNode != null) {
-                System.out.println(currentNode.data);
-                currentNode = currentNode.next;
+            int size = this.size();
+            if (size == 0) {
+                System.out.println("[]");
+            } else {
+                int[] values = new int[this.size()];
+                Node currentNode = this.Head;
+                for (int i = 0; i < size; i++) {
+                    values[i] = currentNode.data;
+                    currentNode = currentNode.next;
+                }
+                System.out.println(Arrays.toString(values));
             }
         }
 
