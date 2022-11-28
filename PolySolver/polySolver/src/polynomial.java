@@ -108,8 +108,8 @@ public class polynomial implements IPolynomialSolver{
         polynomial B = new polynomial(null);//-8x^2-x+1
         polynomial R = new polynomial(null);// R=A*B
 
-        String strA = "[0]";
-        String strB = "[-8, -1, 1]";
+        String strA = "[1, 1]";
+        String strB = "[1, -1]";
 
         int[][] arrA = A.getCoeffAndExpFromList(strA);
         int[][] arrB = B.getCoeffAndExpFromList(strB);
@@ -118,7 +118,7 @@ public class polynomial implements IPolynomialSolver{
         A.setPolynomial(arrA);
         B.setPolynomial(arrB);
 
-        arrR = A.subtract(B);
+        arrR = A.multiply(B);
         R.setPolynomial(arrR);
         System.out.println(R.print());
 
@@ -134,6 +134,32 @@ public class polynomial implements IPolynomialSolver{
             currentTerm.coefficient = -1 * currentTerm.coefficient;
             currentTerm = currentTerm.next;
         }
+    }
+
+    // Reverse a 1D array
+    public int[] reverseArray(int[] ogArr) {
+        int l = ogArr.length;
+        int[] output = ogArr;
+        for (int i = 0; i < Math.floor(l/2); i++) {
+            int temp = output[i];
+            output[i] = output[l-i-1];
+            output[l-i-1] = temp;
+        }
+        
+        return output;
+    }
+
+    // Reverse 2D array
+    public int[][] reverseArray(int[][] ogArr) {
+        int l = ogArr.length;
+        int[][] output = ogArr;
+        for (int i = 0; i < Math.floor(l/2); i++) {
+            int[] temp = output[i];
+            output[i] = output[l-i-1];
+            output[l-i-1] = temp;
+        }
+        
+        return output;
     }
     
 
@@ -300,25 +326,36 @@ public class polynomial implements IPolynomialSolver{
         int productSize = this.size() + p2.size() - 1;
         int maxExponent = productSize-1;
         int[][] productArr = new int[productSize][2];
-        // Populate the product array with the expected exponents (size-1:0)
-        for (int i = 0; i < productSize; i++) {
-            productArr[i][1] = maxExponent-i;
+        
+        int[] arrCoeff1 = new int[this.size()];
+        int[] arrCoeff2 = new int[p2.size()];
+
+        // populate arrCoeff1
+        for (int i = 0; i < arrCoeff1.length; i++) {
+            arrCoeff1[i] = this.arrayRepresentation[i][0];
         }
 
-        // Populate the productArr with the coefficients
-        for (int i=0; i < productSize; i++) {
-            int currentExp = productArr[i][1];
-            int currentCoeff = 0;
-            for (Term t1 = this.Head; t1 != null; t1 = t1.next) {
-                for (Term t2 = this.Head; t2 != null; t2 = t2.next) {
-                    if (t1.exponent + t2.exponent == currentExp) {
-                        currentCoeff += t1.coefficient * t2.coefficient;
-                    }
-                }
+        // populate arrCoeff2
+        for (int i = 0; i < arrCoeff2.length; i++) {
+            arrCoeff2[i] = p2.arrayRepresentation[i][0];
+        }
+
+        // Reverse the arrays to make the first coefficient that of x^0
+        arrCoeff1 = reverseArray(arrCoeff1);
+        arrCoeff2 = reverseArray(arrCoeff2);
+
+        // Populate the productArr with coefficients
+        for (int c1 = 0; c1 < arrCoeff1.length; c1++) {
+            for (int c2 = 0; c2 < arrCoeff2.length; c2++) {
+                productArr[c1+c2][0] += arrCoeff1[c1] * arrCoeff2[c2];
             }
-            productArr[i][0] = currentCoeff;
         }
 
-        return productArr;
+        // Populate the productArr with exponents
+        for (int i = 0; i < productSize; i++) {
+            productArr[i][1] = i;
+        }
+
+        return reverseArray(productArr);
     }
 }
