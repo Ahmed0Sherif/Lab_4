@@ -118,9 +118,11 @@ public class polynomial implements IPolynomialSolver{
         A.setPolynomial(arrA);
         B.setPolynomial(arrB);
 
-        arrR = A.multiply(B);
-        R.setPolynomial(arrR);
-        System.out.println(R.print());
+        // arrR = A.multiply(B);
+        // R.setPolynomial(arrR);
+        System.out.println(A.print());
+        System.out.println(A.evaluatePolynomial(-15));
+        
 
         
 
@@ -222,35 +224,40 @@ public class polynomial implements IPolynomialSolver{
 
     @Override
     public String print() {
-        String[] strTerms = new String[this.size()];
-        Term currTermNode = this.Head;
-        String finalString = "";
-        // populate strTerms
-        for (int i = 0; i < strTerms.length; i++) {
-            String strCurrCoeff = Integer.toString(currTermNode.coefficient);
-            String strCurrExp = Integer.toString(currTermNode.exponent);
-            if (strCurrExp == "0") {
-                strTerms[i] = strCurrCoeff;
-            } else {
-                strTerms[i] = strCurrCoeff + "x^" + strCurrExp;
-            } 
-            currTermNode = currTermNode.next;
-        }
-
-
-        // put the terms in the final format
-        for (int i = 0; i < strTerms.length; i++) {
-            if (i == 0) {
-                finalString += strTerms[i];
-            } else if(strTerms[i].charAt(0) == '-'){
-                finalString += strTerms[i];
-            } else{
-                finalString += "+" + strTerms[i];
+        if (this.size() == 0) {
+            return "[]";
+        } else {
+            String[] strTerms = new String[this.size()];
+            Term currTermNode = this.Head;
+            String finalString = "";
+            // populate strTerms
+            for (int i = 0; i < strTerms.length; i++) {
+                String strCurrCoeff = Integer.toString(currTermNode.coefficient);
+                String strCurrExp = Integer.toString(currTermNode.exponent);
+                if (strCurrExp == "0") {
+                    strTerms[i] = strCurrCoeff;
+                } else {
+                    strTerms[i] = strCurrCoeff + "x^" + strCurrExp;
+                } 
+                currTermNode = currTermNode.next;
             }
+
+
+            // put the terms in the final format
+            for (int i = 0; i < strTerms.length; i++) {
+                if (i == 0) {
+                    finalString += strTerms[i];
+                } else if(strTerms[i].charAt(0) == '-'){
+                    finalString += strTerms[i];
+                } else{
+                    finalString += "+" + strTerms[i];
+                }
+            }
+            
+            
+            return formatEquation(finalString);
         }
         
-        
-        return formatEquation(finalString);
     }
 
     @Override
@@ -264,6 +271,7 @@ public class polynomial implements IPolynomialSolver{
         Term currentTerm = Head;
         while (currentTerm != null) {
             result += currentTerm.coefficient * Math.pow(value, currentTerm.exponent);
+            currentTerm = currentTerm.next;
         }
         return result;
     }
