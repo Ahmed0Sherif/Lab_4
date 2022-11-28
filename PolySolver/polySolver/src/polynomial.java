@@ -45,7 +45,7 @@ interface IPolynomialSolver {
     * @param poly1: first polynomial
     * @param poly2: second polynomial
     * @return the result polynomial*/
-    int[][] subtract(char poly1, char poly2);
+    int[][] subtract(polynomial p2);
   
     /**
     * Multiply two polynomials
@@ -61,7 +61,7 @@ interface IPolynomialSolver {
 class Term extends Node {
     int coefficient;
     int exponent;
-    Term next;
+    Term next = null;
 
     public Term(int coefficient, int exponent){
         this.coefficient = coefficient;
@@ -76,7 +76,7 @@ class Term extends Node {
 }
 
 
-public class polynomial extends SingleLinkedList implements IPolynomialSolver{
+public class polynomial implements IPolynomialSolver{
     // Invalid polynomial sequences
     ///////////////////////////////////          (|+|-)0x^*(|\\+|-)      ,       (|+|-)*x^0(|+|-)            ,            (|+|-)1x^*(|+|-)         ,         (|+|-)*x^1(|+|-)
     final String[] invalidSequences = {"(|\\+|-)(0x\\^)(\\d{0,})(|\\+|-)", "(|\\+|-)(\\d{0,})(x\\^0)(|\\+|-)", "(|\\+|-)(1)(x\\^)(\\d{0,})(|\\+|-)", "(|\\+|-)(\\d{0,})(x\\^1)(|\\+|-)"};
@@ -84,10 +84,21 @@ public class polynomial extends SingleLinkedList implements IPolynomialSolver{
 
     
     Term Head;
-    int size = 0;
+    
+    int[][] arrayRepresentation;
 
     public polynomial(Term head) {
-        super(head);
+        this.Head = head;
+    }
+
+    int size(){
+        int size = 0;
+        Term currentTerm = Head;
+        while (currentTerm != null) {
+            size++;
+            currentTerm = currentTerm.next;
+        }
+        return size;
     }
 
 
@@ -104,6 +115,13 @@ public class polynomial extends SingleLinkedList implements IPolynomialSolver{
     }
 
 
+    public void negatePolynomial() {
+        Term currentTerm = this.Head;
+        while (currentTerm != null) {
+            currentTerm.coefficient = -1 * currentTerm.coefficient;
+        }
+    }
+    
 
     public String formatEquation(String equationInput) {
         String equation = equationInput;
@@ -149,7 +167,7 @@ public class polynomial extends SingleLinkedList implements IPolynomialSolver{
             termsNodes[i] = new Term(terms[i][0], terms[i][1]);
         }
         this.Head = termsNodes[0];
-        this.size = termsNodes.length;
+        this.arrayRepresentation = terms;
 
         // Create relation between Terms
         for (int i = 0; i < numberOfTerms; i++) {
@@ -164,7 +182,7 @@ public class polynomial extends SingleLinkedList implements IPolynomialSolver{
 
     @Override
     public String print() {
-        String[] strTerms = new String[this.size];
+        String[] strTerms = new String[this.size()];
         Term currTermNode = this.Head;
         String finalString = "";
         // populate strTerms
@@ -212,8 +230,8 @@ public class polynomial extends SingleLinkedList implements IPolynomialSolver{
 
     @Override
     public int[][] add(polynomial p2) {
-        int additionSize = Math.max(this.size, p2.size);
-        int sizeDifference = Math.abs(this.size - p2.size);
+        int additionSize = Math.max(this.size(), p2.size());
+        int sizeDifference = Math.abs(this.size() - p2.size());
         int[][] additionResult = new int[additionSize][2];
         if (sizeDifference != 0) {
             int[][] dummyPolynomialArr = new int[sizeDifference][2];
@@ -221,7 +239,7 @@ public class polynomial extends SingleLinkedList implements IPolynomialSolver{
             // create zero padding
             dummyPolynomial.setPolynomial(dummyPolynomialArr);
             // determine which polynomial is smaller
-            polynomial smallerPolynomial =this.size < p2.size ? this : p2;
+            polynomial smallerPolynomial =this.size() < p2.size() ? this : p2;
             
             // get tail of the dummy node
             Term lastDummyTerm = dummyPolynomial.Head;
@@ -256,9 +274,11 @@ public class polynomial extends SingleLinkedList implements IPolynomialSolver{
     }
 
     @Override
-    public int[][] subtract(char poly1, char poly2) {
-        // TODO Auto-generated method stub
-        return null;
+    public int[][] subtract(polynomial p2) {
+        p2.negatePolynomial();
+        int[][] result = this.add(p2);
+        p2.negatePolynomial();
+        return result;
     }
 
     @Override
