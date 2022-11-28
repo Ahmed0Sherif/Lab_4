@@ -53,7 +53,7 @@ interface IPolynomialSolver {
     * @param poly2: second polynomial
     * @return: the result polynomial
     */
-    int[][] multiply(char poly1, char poly2);
+    int[][] multiply(polynomial p2);
 }
 
 
@@ -104,12 +104,25 @@ public class polynomial implements IPolynomialSolver{
 
 // MAIN FUNCTION
     public static void main(String[] args) throws Exception {
-        polynomial A = new polynomial(null);
-        String strCoeffAndExp = "[1, -3, 1]";
-        int[][] intArrCoeffAndExp = A.getCoeffAndExpFromList(strCoeffAndExp);
-        // System.out.println(intArrCoeffAndExp[0][0]);
-        A.setPolynomial(intArrCoeffAndExp);
-        System.out.println(A.print());
+        polynomial A = new polynomial(null);//-x+1
+        polynomial B = new polynomial(null);//-8x^2-x+1
+        polynomial R = new polynomial(null);// R=A*B
+
+        String strA = "[0]";
+        String strB = "[-8, -1, 1]";
+
+        int[][] arrA = A.getCoeffAndExpFromList(strA);
+        int[][] arrB = B.getCoeffAndExpFromList(strB);
+        int[][] arrR;
+
+        A.setPolynomial(arrA);
+        B.setPolynomial(arrB);
+
+        arrR = A.subtract(B);
+        R.setPolynomial(arrR);
+        System.out.println(R.print());
+
+        
 
 
     }
@@ -119,6 +132,7 @@ public class polynomial implements IPolynomialSolver{
         Term currentTerm = this.Head;
         while (currentTerm != null) {
             currentTerm.coefficient = -1 * currentTerm.coefficient;
+            currentTerm = currentTerm.next;
         }
     }
     
@@ -282,8 +296,29 @@ public class polynomial implements IPolynomialSolver{
     }
 
     @Override
-    public int[][] multiply(char poly1, char poly2) {
-        // TODO Auto-generated method stub
-        return null;
+    public int[][] multiply(polynomial p2) {
+        int productSize = this.size() + p2.size() - 1;
+        int maxExponent = productSize-1;
+        int[][] productArr = new int[productSize][2];
+        // Populate the product array with the expected exponents (size-1:0)
+        for (int i = 0; i < productSize; i++) {
+            productArr[i][1] = maxExponent-i;
+        }
+
+        // Populate the productArr with the coefficients
+        for (int i=0; i < productSize; i++) {
+            int currentExp = productArr[i][1];
+            int currentCoeff = 0;
+            for (Term t1 = this.Head; t1 != null; t1 = t1.next) {
+                for (Term t2 = this.Head; t2 != null; t2 = t2.next) {
+                    if (t1.exponent + t2.exponent == currentExp) {
+                        currentCoeff += t1.coefficient * t2.coefficient;
+                    }
+                }
+            }
+            productArr[i][0] = currentCoeff;
+        }
+
+        return productArr;
     }
 }
