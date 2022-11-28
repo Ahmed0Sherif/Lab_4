@@ -143,7 +143,11 @@ interface ILinkedList {
                     myList.dispList();
                     break;
                 case "isEmpty":
-                    System.out.println(myList.isEmpty());
+                    if (myList.isEmpty()) {
+                        System.out.println("True");
+                    } else {
+                        System.out.println("False");
+                    };
                     break;
                 case "remove":
                     int indexToRemove = scan.nextInt();
@@ -171,7 +175,11 @@ interface ILinkedList {
                 case "contains":
                     int valueToContain = scan.nextInt();
                     Node nodeToContain = new Node(valueToContain);
-                    System.out.println(myList.contains(nodeToContain));
+                    if (myList.contains(nodeToContain)) {
+                        System.out.println("True");
+                    } else {
+                        System.out.println("False");
+                    }
                     break;
                 case "size":
                     System.out.println(myList.size());

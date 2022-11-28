@@ -1,3 +1,6 @@
+import java.lang.reflect.Array;
+import java.util.Arrays;
+
 interface IPolynomialSolver {
     /**
     * Set polynomial terms (coefficients & exponents)
@@ -56,6 +59,7 @@ interface IPolynomialSolver {
 class Term extends Node {
     int coefficient;
     int exponent;
+    Term next;
 
     public Term(int coefficient, int exponent){
         this.coefficient = coefficient;
@@ -71,23 +75,31 @@ class Term extends Node {
 
 
 public class polynomial extends SingleLinkedList implements IPolynomialSolver{
+    // Invalid polynomial sequences
+    final String[] invalidSequences = {"^(0x\\^)(\\d{0,})(\\+)", "^(0x\\^)(\\d{0,})(-)"};
+    final CharSequence[] replacements = {"", "-"};
+
     
     Term Head;
+    int size = 0;
 
     public polynomial(Term head) {
         super(head);
     }
 
 
-
+// MAIN FUNCTION
     public static void main(String[] args) throws Exception {
-        Term iniTerm = new Term(3, 5);
-        Term secondTerm = new Term(3, 5);
-        iniTerm.next = secondTerm;
-        polynomial A = new polynomial(iniTerm);
-        System.out.println(A.size());
+        polynomial A = new polynomial(null);
+        String strCoeffAndExp = "[1, -3, 1]";
+        int[][] intArrCoeffAndExp = A.getCoeffAndExpFromList(strCoeffAndExp);
+        // System.out.println(intArrCoeffAndExp[0][0]);
+        A.setPolynomial(intArrCoeffAndExp);
+        System.out.println(A.print());
+
 
     }
+
 
 
     public int[][] getCoeffAndExpFromList(String strList){
@@ -104,9 +116,7 @@ public class polynomial extends SingleLinkedList implements IPolynomialSolver{
             
         }
 
-
-
-        return null;
+        return output;
     }
 
     @Override
@@ -118,6 +128,8 @@ public class polynomial extends SingleLinkedList implements IPolynomialSolver{
         for (int i = 0; i < numberOfTerms; i++) {
             termsNodes[i] = new Term(terms[i][0], terms[i][1]);
         }
+        this.Head = termsNodes[0];
+        this.size = termsNodes.length;
 
         // Create relation between Terms
         for (int i = 0; i < numberOfTerms; i++) {
@@ -132,8 +144,36 @@ public class polynomial extends SingleLinkedList implements IPolynomialSolver{
 
     @Override
     public String print() {
-        String[] strTerms = new String[this.size()];
-        return null;
+        String[] strTerms = new String[this.size];
+        Term currTermNode = this.Head;
+        String finalString = "";
+        // populate strTerms
+        for (int i = 0; i < strTerms.length; i++) {
+            String strCurrCoeff = Integer.toString(currTermNode.coefficient);
+            String strCurrExp = Integer.toString(currTermNode.exponent);
+            if (strCurrExp == "0") {
+                strTerms[i] = strCurrCoeff;
+            } else {
+                strTerms[i] = strCurrCoeff + "x^" + strCurrExp;
+            } 
+            currTermNode = currTermNode.next;
+        }
+
+
+        // put the terms in the final format
+        for (int i = 0; i < strTerms.length; i++) {
+            if (i == 0) {
+                finalString += strTerms[i];
+            } else if(strTerms[i].charAt(0) == '-'){
+                finalString += strTerms[i];
+            } else{
+                finalString += "+" + strTerms[i];
+            }
+        }
+        //TODO: check for invalid patterns using regex
+        
+        
+        return finalString;
     }
 
     @Override
