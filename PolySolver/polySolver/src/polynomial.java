@@ -215,7 +215,44 @@ public class polynomial extends SingleLinkedList implements IPolynomialSolver{
         int additionSize = Math.max(this.size, p2.size);
         int sizeDifference = Math.abs(this.size - p2.size);
         int[][] additionResult = new int[additionSize][2];
-        return null;
+        if (sizeDifference != 0) {
+            int[][] dummyPolynomialArr = new int[sizeDifference][2];
+            polynomial dummyPolynomial = new polynomial(null);
+            // create zero padding
+            dummyPolynomial.setPolynomial(dummyPolynomialArr);
+            // determine which polynomial is smaller
+            polynomial smallerPolynomial =this.size < p2.size ? this : p2;
+            
+            // get tail of the dummy node
+            Term lastDummyTerm = dummyPolynomial.Head;
+            while (lastDummyTerm.next != null) {
+                lastDummyTerm = lastDummyTerm.next;
+            }
+            // add the padding to the beginning of the smaller polynomial and store the result in the dummyPolynomial
+            lastDummyTerm.next = smallerPolynomial.Head;
+
+            // add p2 to the dummyPolynomial
+            return dummyPolynomial.add(p2);
+
+        }
+        else{
+            Term t1 = this.Head;
+            Term t2 = p2.Head;
+            for (int i = 0; i < additionSize; i++) {
+                // get the coefficients and exponents of current iteration
+                int currentCoeff = t1.coefficient + t2.coefficient;
+                int currentExp = Math.max(t1.exponent, t2.exponent);
+                // put the coefficient and exponent in their respective places
+                additionResult[i][0] = currentCoeff;
+                additionResult[i][1] = currentExp;
+                // update the reference of the current terms
+                t1 = t1.next;
+                t2 = t2.next;
+
+            }
+            return additionResult;
+
+        }
     }
 
     @Override
