@@ -1,5 +1,7 @@
 import java.lang.reflect.Array;
 import java.util.Arrays;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 interface IPolynomialSolver {
     /**
@@ -20,7 +22,7 @@ interface IPolynomialSolver {
     * Clear the polynomial
     * @param poly: name of the polynomial
     */
-      void clearPolynomial(char poly);
+      void clearPolynomial();
   
     /**
     * Evaluate the polynomial
@@ -28,7 +30,7 @@ interface IPolynomialSolver {
     * @param value: the polynomial constant value
     * @return the value of the polynomial
     */
-    float evaluatePolynomial(char poly, float value);
+    float evaluatePolynomial(float value);
   
     /**
     * Add two polynomials
@@ -36,7 +38,7 @@ interface IPolynomialSolver {
     * @param poly2: second polynomial
     * @return the result polynomial
     */
-    int[][] add(char poly1, char poly2);
+    int[][] add(polynomial p2);
   
     /**
     * Subtract two polynomials
@@ -76,8 +78,9 @@ class Term extends Node {
 
 public class polynomial extends SingleLinkedList implements IPolynomialSolver{
     // Invalid polynomial sequences
-    final String[] invalidSequences = {"^(0x\\^)(\\d{0,})(\\+)", "^(0x\\^)(\\d{0,})(-)"};
-    final CharSequence[] replacements = {"", "-"};
+    ///////////////////////////////////          (|+|-)0x^*(|\\+|-)      ,       (|+|-)*x^0(|+|-)            ,            (|+|-)1x^*(|+|-)         ,         (|+|-)*x^1(|+|-)
+    final String[] invalidSequences = {"(|\\+|-)(0x\\^)(\\d{0,})(|\\+|-)", "(|\\+|-)(\\d{0,})(x\\^0)(|\\+|-)", "(|\\+|-)(1)(x\\^)(\\d{0,})(|\\+|-)", "(|\\+|-)(\\d{0,})(x\\^1)(|\\+|-)"};
+    final String[] replacements = {"$4", ("$1" + "$2" + "$4"), ("$1" + "$3" + "$4" + "$5"), ("$1" + "$2" + "x" + "$4")};
 
     
     Term Head;
@@ -101,6 +104,23 @@ public class polynomial extends SingleLinkedList implements IPolynomialSolver{
     }
 
 
+
+    public String formatEquation(String equationInput) {
+        String equation = equationInput;
+        for (int i = 0; i < replacements.length; i++) {
+            String invalidSequence = invalidSequences[i];
+            String replacement = replacements[i];
+
+            Pattern pattern = Pattern.compile(invalidSequence);
+            Matcher matcher = pattern.matcher(equation);
+
+            if (matcher.find()) {
+                equation = matcher.replaceAll(replacement);
+            }
+        }
+
+        return equation;
+    }
 
     public int[][] getCoeffAndExpFromList(String strList){
         int[] intList = SingleLinkedList.stringToIntArray(strList);
@@ -170,27 +190,31 @@ public class polynomial extends SingleLinkedList implements IPolynomialSolver{
                 finalString += "+" + strTerms[i];
             }
         }
-        //TODO: check for invalid patterns using regex
         
         
-        return finalString;
+        return formatEquation(finalString);
     }
 
     @Override
-    public void clearPolynomial(char poly) {
-        // TODO Auto-generated method stub
-        
+    public void clearPolynomial() {
+        this.Head = null;
     }
 
     @Override
-    public float evaluatePolynomial(char poly, float value) {
-        // TODO Auto-generated method stub
-        return 0;
+    public float evaluatePolynomial(float value) {
+        float result = 0;
+        Term currentTerm = Head;
+        while (currentTerm != null) {
+            result += currentTerm.coefficient * Math.pow(value, currentTerm.exponent);
+        }
+        return result;
     }
 
     @Override
-    public int[][] add(char poly1, char poly2) {
-        // TODO Auto-generated method stub
+    public int[][] add(polynomial p2) {
+        int additionSize = Math.max(this.size, p2.size);
+        int sizeDifference = Math.abs(this.size - p2.size);
+        int[][] additionResult = new int[additionSize][2];
         return null;
     }
 
