@@ -78,8 +78,8 @@ class Term {
 public class Polynomial implements IPolynomialSolver{
     // Invalid polynomial sequences (regex)
     ///////////////////////////////////          (|+|-)0x^*(|\\+|-)      ,       (|+|-)*x^0(|+|-)            ,            (|+|-)1x^*(|+|-)         ,         (|+|-)*x^1(|+|-)
-    final String[] invalidSequences = {"(^|\\+|-)(0x\\^)(\\d{0,})($|\\+|-)", "(^|\\+|-)(\\d{0,})(x\\^0)($|\\+|-)", "(^|\\+)(1)(x\\^)(\\d{0,})($|\\+|-)", "(^|\\+|-)(\\d{0,})(x\\^1)($|\\+|-)", "^(\\+)", "(\\+|-)$"};
-    final String[] replacements = {"$4", ("$1" + "$2" + "$4"), ("$1" + "$3" + "$4" + "$5"), ("$1" + "$2" + "x" + "$4"), "", ""};
+    final String[] invalidSequences = {"(^|\\+|-)(0x\\^)(\\d{0,})($|\\+|-)", "(^|\\+|-)(\\d{0,})(x\\^0)($|\\+|-)", "(^|\\+)(1)(x\\^)(\\d{0,})($|\\+|-)", "(^|\\+|-)(\\d{0,})(x\\^1)($|\\+|-)", "^(\\+)", "(\\+|-)$", "(\\+|-)0$"};
+    final String[] replacements = {"$4", ("$1" + "$2" + "$4"), ("$1" + "$3" + "$4" + "$5"), ("$1" + "$2" + "x" + "$4"), "", "", ""};
     final static String err = "Error";
 
     
@@ -200,8 +200,7 @@ public class Polynomial implements IPolynomialSolver{
 
                         break;
                     default:
-                        System.out.println(err);
-                        break;
+                        throw new RuntimeException();
                 }
             } catch (Exception e) {
                 System.out.println(err);
