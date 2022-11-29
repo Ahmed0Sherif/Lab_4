@@ -78,8 +78,8 @@ class Term {
 public class Polynomial implements IPolynomialSolver{
     // Invalid polynomial sequences
     ///////////////////////////////////          (|+|-)0x^*(|\\+|-)      ,       (|+|-)*x^0(|+|-)            ,            (|+|-)1x^*(|+|-)         ,         (|+|-)*x^1(|+|-)
-    final String[] invalidSequences = {"(^|\\+|-)(0x\\^)(\\d{0,})($|\\+|-)", "(^|\\+|-)(\\d{0,})(x\\^0)($|\\+|-)", "(^|\\+)(1)(x\\^)(\\d{0,})($|\\+|-)", "(^|\\+|-)(\\d{0,})(x\\^1)($|\\+|-)"};
-    final String[] replacements = {"$4", ("$1" + "$2" + "$4"), ("$1" + "$3" + "$4" + "$5"), ("$1" + "$2" + "x" + "$4")};
+    final String[] invalidSequences = {"(^|\\+|-)(0x\\^)(\\d{0,})($|\\+|-)", "(^|\\+|-)(\\d{0,})(x\\^0)($|\\+|-)", "(^|\\+)(1)(x\\^)(\\d{0,})($|\\+|-)", "(^|\\+|-)(\\d{0,})(x\\^1)($|\\+|-)", "^(\\+)"};
+    final String[] replacements = {"$4", ("$1" + "$2" + "$4"), ("$1" + "$3" + "$4" + "$5"), ("$1" + "$2" + "x" + "$4"), ""};
     final static String err = "Error";
 
     
@@ -239,7 +239,7 @@ public class Polynomial implements IPolynomialSolver{
         
     }
 
-    public Polynomial charToPolynomial(String p, Polynomial[] polyArr) {
+    public Polynomial charToPolynomial(String p, Polynomial[] polyArr) throws RuntimeException {
         
         switch (p) {
             case "A":
@@ -251,7 +251,7 @@ public class Polynomial implements IPolynomialSolver{
             case "R":
                 return polyArr[3];
             default:
-                return null;
+                throw new RuntimeException();
         }
     }
 
