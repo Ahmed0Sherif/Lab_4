@@ -78,7 +78,7 @@ class Term {
 public class Polynomial implements IPolynomialSolver{
     // Invalid polynomial sequences
     ///////////////////////////////////          (|+|-)0x^*(|\\+|-)      ,       (|+|-)*x^0(|+|-)            ,            (|+|-)1x^*(|+|-)         ,         (|+|-)*x^1(|+|-)
-    final String[] invalidSequences = {"(^|\\+|-)(0x\\^)(\\d{0,})($|\\+|-)", "(^|\\+|-)(\\d{0,})(x\\^0)($|\\+|-)", "(^|\\+|-)(1)(x\\^)(\\d{0,})($|\\+|-)", "(^|\\+|-)(\\d{0,})(x\\^1)($|\\+|-)"};
+    final String[] invalidSequences = {"(^|\\+|-)(0x\\^)(\\d{0,})($|\\+|-)", "(^|\\+|-)(\\d{0,})(x\\^0)($|\\+|-)", "(^|\\+)(1)(x\\^)(\\d{0,})($|\\+|-)", "(^|\\+|-)(\\d{0,})(x\\^1)($|\\+|-)"};
     final String[] replacements = {"$4", ("$1" + "$2" + "$4"), ("$1" + "$3" + "$4" + "$5"), ("$1" + "$2" + "x" + "$4")};
     final static String err = "Error";
 
@@ -101,7 +101,7 @@ public class Polynomial implements IPolynomialSolver{
     }
 
 
-// MAIN FUNCTION
+    // MAIN FUNCTION
     public static void main(String[] args) throws Exception {
 
         Polynomial mPolynomial = new Polynomial(null);// polynomial to call non-static functions
@@ -211,6 +211,14 @@ public class Polynomial implements IPolynomialSolver{
         
         
 
+    }
+
+    public boolean isAllZeros(){
+        boolean result = true;
+        for (int i = 0; i < arrayRepresentation.length; i++) {
+            result = result && (arrayRepresentation[i][0] == 0);
+        }
+        return result;
     }
 
     public int[] stringToIntArray(String s){
@@ -344,7 +352,11 @@ public class Polynomial implements IPolynomialSolver{
     public String print() {
         if (this.size() == 0) {
             return "[]";
-        } else {
+        }
+        else if (this.isAllZeros()) {
+            return "0";
+        } 
+        else {
             String[] strTerms = new String[this.size()];
             Term currTermNode = this.Head;
             String finalString = "";
@@ -395,92 +407,105 @@ public class Polynomial implements IPolynomialSolver{
     }
 
     @Override
-    public int[][] add(Polynomial p2) {
-        int additionSize = Math.max(this.size(), p2.size());
-        int sizeDifference = Math.abs(this.size() - p2.size());
-        int[][] additionResult = new int[additionSize][2];
-        if (sizeDifference != 0) {
-            int[][] dummyPolynomialArr = new int[sizeDifference][2];
-            Polynomial dummyPolynomial = new Polynomial(null);
-            // create zero padding
-            dummyPolynomial.setPolynomial(dummyPolynomialArr);
-            // determine which polynomial is smaller
-            Polynomial smallerPolynomial =this.size() < p2.size() ? this : p2;
-            
-            // get tail of the dummy node
-            Term lastDummyTerm = dummyPolynomial.Head;
-            while (lastDummyTerm.next != null) {
-                lastDummyTerm = lastDummyTerm.next;
-            }
-            // add the padding to the beginning of the smaller polynomial and store the result in the dummyPolynomial
-            lastDummyTerm.next = smallerPolynomial.Head;
+    public int[][] add(Polynomial p2) throws RuntimeException {
+        if (this.Head == null || p2.Head == null) {
+            throw new RuntimeException();
+        } else {
+            int additionSize = Math.max(this.size(), p2.size());
+            int sizeDifference = Math.abs(this.size() - p2.size());
+            int[][] additionResult = new int[additionSize][2];
+            if (sizeDifference != 0) {
+                int[][] dummyPolynomialArr = new int[sizeDifference][2];
+                Polynomial dummyPolynomial = new Polynomial(null);
+                // create zero padding
+                dummyPolynomial.setPolynomial(dummyPolynomialArr);
+                // determine which polynomial is smaller
+                Polynomial smallerPolynomial =this.size() < p2.size() ? this : p2;
+                
+                // get tail of the dummy node
+                Term lastDummyTerm = dummyPolynomial.Head;
+                while (lastDummyTerm.next != null) {
+                    lastDummyTerm = lastDummyTerm.next;
+                }
+                // add the padding to the beginning of the smaller polynomial and store the result in the dummyPolynomial
+                lastDummyTerm.next = smallerPolynomial.Head;
 
-            // add p2 to the dummyPolynomial
-            return dummyPolynomial.add(p2);
-
-        }
-        else{
-            Term t1 = this.Head;
-            Term t2 = p2.Head;
-            for (int i = 0; i < additionSize; i++) {
-                // get the coefficients and exponents of current iteration
-                int currentCoeff = t1.coefficient + t2.coefficient;
-                int currentExp = Math.max(t1.exponent, t2.exponent);
-                // put the coefficient and exponent in their respective places
-                additionResult[i][0] = currentCoeff;
-                additionResult[i][1] = currentExp;
-                // update the reference of the current terms
-                t1 = t1.next;
-                t2 = t2.next;
+                // add p2 to the dummyPolynomial
+                return dummyPolynomial.add(p2);
 
             }
-            return additionResult;
+            else{
+                Term t1 = this.Head;
+                Term t2 = p2.Head;
+                for (int i = 0; i < additionSize; i++) {
+                    // get the coefficients and exponents of current iteration
+                    int currentCoeff = t1.coefficient + t2.coefficient;
+                    int currentExp = Math.max(t1.exponent, t2.exponent);
+                    // put the coefficient and exponent in their respective places
+                    additionResult[i][0] = currentCoeff;
+                    additionResult[i][1] = currentExp;
+                    // update the reference of the current terms
+                    t1 = t1.next;
+                    t2 = t2.next;
+
+                }
+                return additionResult;
+            }
 
         }
     }
 
     @Override
-    public int[][] subtract(Polynomial p2) {
-        p2.negatePolynomial();
-        int[][] result = this.add(p2);
-        p2.negatePolynomial();
-        return result;
-    }
-
-    @Override
-    public int[][] multiply(Polynomial p2) {
-        int productSize = this.size() + p2.size() - 1;
-        int[][] productArr = new int[productSize][2];
+    public int[][] subtract(Polynomial p2) throws RuntimeException{
+        if (this.Head == null || p2.Head == null) {
+            throw new RuntimeException();
+        } else {
+            p2.negatePolynomial();
+            int[][] result = this.add(p2);
+            p2.negatePolynomial();
+            return result;
+        }
         
-        int[] arrCoeff1 = new int[this.size()];
-        int[] arrCoeff2 = new int[p2.size()];
+    }
 
-        // populate arrCoeff1
-        for (int i = 0; i < arrCoeff1.length; i++) {
-            arrCoeff1[i] = this.arrayRepresentation[i][0];
-        }
+    @Override
+    public int[][] multiply(Polynomial p2) throws RuntimeException {
+        if (this.Head == null || p2.Head == null) {
+            throw new RuntimeException();
+        } else {
+            int productSize = this.size() + p2.size() - 1;
+            int[][] productArr = new int[productSize][2];
+            
+            int[] arrCoeff1 = new int[this.size()];
+            int[] arrCoeff2 = new int[p2.size()];
 
-        // populate arrCoeff2
-        for (int i = 0; i < arrCoeff2.length; i++) {
-            arrCoeff2[i] = p2.arrayRepresentation[i][0];
-        }
-
-        // Reverse the arrays to make the first coefficient that of x^0
-        arrCoeff1 = reverseArray(arrCoeff1);
-        arrCoeff2 = reverseArray(arrCoeff2);
-
-        // Populate the productArr with coefficients
-        for (int c1 = 0; c1 < arrCoeff1.length; c1++) {
-            for (int c2 = 0; c2 < arrCoeff2.length; c2++) {
-                productArr[c1+c2][0] += arrCoeff1[c1] * arrCoeff2[c2];
+            // populate arrCoeff1
+            for (int i = 0; i < arrCoeff1.length; i++) {
+                arrCoeff1[i] = this.arrayRepresentation[i][0];
             }
-        }
 
-        // Populate the productArr with exponents
-        for (int i = 0; i < productSize; i++) {
-            productArr[i][1] = i;
-        }
+            // populate arrCoeff2
+            for (int i = 0; i < arrCoeff2.length; i++) {
+                arrCoeff2[i] = p2.arrayRepresentation[i][0];
+            }
 
-        return reverseArray(productArr);
+            // Reverse the arrays to make the first coefficient that of x^0
+            arrCoeff1 = reverseArray(arrCoeff1);
+            arrCoeff2 = reverseArray(arrCoeff2);
+
+            // Populate the productArr with coefficients
+            for (int c1 = 0; c1 < arrCoeff1.length; c1++) {
+                for (int c2 = 0; c2 < arrCoeff2.length; c2++) {
+                    productArr[c1+c2][0] += arrCoeff1[c1] * arrCoeff2[c2];
+                }
+            }
+
+            // Populate the productArr with exponents
+            for (int i = 0; i < productSize; i++) {
+                productArr[i][1] = i;
+            }
+
+            return reverseArray(productArr);
+        }
     }
 }
