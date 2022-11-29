@@ -76,10 +76,10 @@ class Term {
 
 
 public class Polynomial implements IPolynomialSolver{
-    // Invalid polynomial sequences
+    // Invalid polynomial sequences (regex)
     ///////////////////////////////////          (|+|-)0x^*(|\\+|-)      ,       (|+|-)*x^0(|+|-)            ,            (|+|-)1x^*(|+|-)         ,         (|+|-)*x^1(|+|-)
-    final String[] invalidSequences = {"(^|\\+|-)(0x\\^)(\\d{0,})($|\\+|-)", "(^|\\+|-)(\\d{0,})(x\\^0)($|\\+|-)", "(^|\\+)(1)(x\\^)(\\d{0,})($|\\+|-)", "(^|\\+|-)(\\d{0,})(x\\^1)($|\\+|-)", "^(\\+)"};
-    final String[] replacements = {"$4", ("$1" + "$2" + "$4"), ("$1" + "$3" + "$4" + "$5"), ("$1" + "$2" + "x" + "$4"), ""};
+    final String[] invalidSequences = {"(^|\\+|-)(0x\\^)(\\d{0,})($|\\+|-)", "(^|\\+|-)(\\d{0,})(x\\^0)($|\\+|-)", "(^|\\+)(1)(x\\^)(\\d{0,})($|\\+|-)", "(^|\\+|-)(\\d{0,})(x\\^1)($|\\+|-)", "^(\\+)", "(\\+|-)$"};
+    final String[] replacements = {"$4", ("$1" + "$2" + "$4"), ("$1" + "$3" + "$4" + "$5"), ("$1" + "$2" + "x" + "$4"), "", ""};
     final static String err = "Error";
 
     
@@ -292,18 +292,26 @@ public class Polynomial implements IPolynomialSolver{
     
 
     public String formatEquation(String equationInput) {
+        boolean foundInvalidExpression = false;
         String equation = equationInput;
-        for (int i = 0; i < replacements.length; i++) {
-            String invalidSequence = invalidSequences[i];
-            String replacement = replacements[i];
-
-            Pattern pattern = Pattern.compile(invalidSequence);
-            Matcher matcher = pattern.matcher(equation);
-
-            if (matcher.find()) {
-                equation = matcher.replaceAll(replacement);
+        do {
+            foundInvalidExpression = false;
+            for (int i = 0; i < replacements.length; i++) {
+                String invalidSequence = invalidSequences[i];
+                String replacement = replacements[i];
+    
+                Pattern pattern = Pattern.compile(invalidSequence);
+                Matcher matcher = pattern.matcher(equation);
+                boolean currentFinder = matcher.find();
+                foundInvalidExpression = foundInvalidExpression || currentFinder;
+    
+                if (currentFinder) {
+                    equation = matcher.replaceAll(replacement);
+                }
             }
-        }
+        } while (foundInvalidExpression);
+            
+        
 
         return equation;
     }
