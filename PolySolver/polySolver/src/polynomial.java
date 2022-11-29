@@ -1,5 +1,6 @@
 import java.lang.reflect.Array;
 import java.util.Arrays;
+import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -58,7 +59,7 @@ interface IPolynomialSolver {
 
 
 
-class Term extends Node {
+class Term {
     int coefficient;
     int exponent;
     Term next = null;
@@ -79,8 +80,12 @@ class Term extends Node {
 public class polynomial implements IPolynomialSolver{
     // Invalid polynomial sequences
     ///////////////////////////////////          (|+|-)0x^*(|\\+|-)      ,       (|+|-)*x^0(|+|-)            ,            (|+|-)1x^*(|+|-)         ,         (|+|-)*x^1(|+|-)
-    final String[] invalidSequences = {"(|\\+|-)(0x\\^)(\\d{0,})(|\\+|-)", "(|\\+|-)(\\d{0,})(x\\^0)(|\\+|-)", "(|\\+|-)(1)(x\\^)(\\d{0,})(|\\+|-)", "(|\\+|-)(\\d{0,})(x\\^1)(|\\+|-)"};
+    final String[] invalidSequences = {"(^|\\+|-)(0x\\^)(\\d{0,})($|\\+|-)", "(^|\\+|-)(\\d{0,})(x\\^0)($|\\+|-)", "(^|\\+|-)(1)(x\\^)(\\d{0,})($|\\+|-)", "(^|\\+|-)(\\d{0,})(x\\^1)($|\\+|-)"};
     final String[] replacements = {"$4", ("$1" + "$2" + "$4"), ("$1" + "$3" + "$4" + "$5"), ("$1" + "$2" + "x" + "$4")};
+    final static String err = "Error";
+
+    
+
 
     
     Term Head;
@@ -104,29 +109,138 @@ public class polynomial implements IPolynomialSolver{
 
 // MAIN FUNCTION
     public static void main(String[] args) throws Exception {
-        polynomial A = new polynomial(null);//-x+1
-        polynomial B = new polynomial(null);//-8x^2-x+1
-        polynomial R = new polynomial(null);// R=A*B
 
-        String strA = "[1, 1]";
-        String strB = "[1, -1]";
+        polynomial mPolynomial = new polynomial(null);// polynomial to call non-static functions
+        polynomial A = new polynomial(null);
+        polynomial B = new polynomial(null);
+        polynomial C = new polynomial(null);
+        polynomial R = new polynomial(null);
+        polynomial[] polyArr = {A, B, C, R};
+        String command;
 
-        int[][] arrA = A.getCoeffAndExpFromList(strA);
-        int[][] arrB = B.getCoeffAndExpFromList(strB);
-        int[][] arrR;
+        Scanner scan = new Scanner(System.in);
 
-        A.setPolynomial(arrA);
-        B.setPolynomial(arrB);
+        while (true) {
+            try {
+                command = scan.next();
+            } catch (Exception e) {
+                break;
+            }
+            
+            switch (command) {
+                case "set":
 
-        // arrR = A.multiply(B);
-        // R.setPolynomial(arrR);
-        System.out.println(A.print());
-        System.out.println(A.evaluatePolynomial(-15));
+                    String choiceSet = scan.next();// A, B, C
+                    polynomial targetPolySet = mPolynomial.charToPolynomial(choiceSet, polyArr);
+                    String strValues = scan.next();
+                    int[][] arrRepTarget = mPolynomial.getCoeffAndExpFromList(strValues);
+                    targetPolySet.setPolynomial(arrRepTarget);
+
+                    break;
+                case "print":
+
+                    String choicePrint = scan.next();// A, B, C
+                    polynomial targetPolyPrint = mPolynomial.charToPolynomial(choicePrint, polyArr);
+                    System.out.println(targetPolyPrint.print());
+
+                    break;
+                case "clear":
+                    String choiceClear = scan.next();// A, B, C
+                    polynomial targetPolyClear = mPolynomial.charToPolynomial(choiceClear, polyArr);
+                    targetPolyClear.clearPolynomial();
+                    System.out.println(targetPolyClear.print());
+                    break;
+                case "eval":
+
+                    String choiceEval = scan.next();// A, B, C
+                    float valueToEval = scan.nextFloat();
+                    polynomial targetPolyEval = mPolynomial.charToPolynomial(choiceEval, polyArr);
+                    float result = targetPolyEval.evaluatePolynomial(valueToEval);
+                    if (result % 1 == 0) {
+                        System.out.println((int) result);
+                    } else {
+                        System.out.println(result);
+                    }
+
+                    break;
+                case "add":
+
+                    String chioceAdd1 = scan.next();
+                    String chioceAdd2 = scan.next();
+                    polynomial targetAdd1 = mPolynomial.charToPolynomial(chioceAdd1, polyArr);
+                    polynomial targetAdd2 = mPolynomial.charToPolynomial(chioceAdd2, polyArr);
+                    R.clearPolynomial();
+                    R.arrayRepresentation = targetAdd1.add(targetAdd2);
+                    R.setPolynomial(R.arrayRepresentation);
+                    System.out.println(R.print());
+                    
+                    break;
+                case "sub":
+
+                    String chioceSub1 = scan.next();
+                    String chioceSub2 = scan.next();
+                    polynomial targetSub1 = mPolynomial.charToPolynomial(chioceSub1, polyArr);
+                    polynomial targetSub2 = mPolynomial.charToPolynomial(chioceSub2, polyArr);
+                    R.clearPolynomial();
+                    R.arrayRepresentation = targetSub1.subtract(targetSub2);
+                    R.setPolynomial(R.arrayRepresentation);
+                    System.out.println(R.print());
+
+                    break;
+                case "mult":
+                    
+                    String chioceMult1 = scan.next();
+                    String chioceMult2 = scan.next();
+                    polynomial targetMult1 = mPolynomial.charToPolynomial(chioceMult1, polyArr);
+                    polynomial targetMult2 = mPolynomial.charToPolynomial(chioceMult2, polyArr);
+                    R.clearPolynomial();
+                    R.arrayRepresentation = targetMult1.multiply(targetMult2);
+                    R.setPolynomial(R.arrayRepresentation);
+                    System.out.println(R.print());
+
+                    break;
+                default:
+                    System.out.println(err);
+                    break;
+            }
+        }
+        
         
 
+    }
+
+    public int[] stringToIntArray(String s){
+        if (s.equals("[]")) {
+            int[] output = new int[0];
+            return output;
+        } else {
+            String[] arrayOfStrings = s.trim().replace("[", "").replace("]", "").split(",");
+            int len = arrayOfStrings.length;
+            int[] output = new int[len];
+
+            for (int i = 0; i < len; i++) {
+                output[i] = Integer.valueOf(arrayOfStrings[i].trim());
+            }
+            return output;
+
+        }
         
+    }
 
-
+    public polynomial charToPolynomial(String p, polynomial[] polyArr) {
+        
+        switch (p) {
+            case "A":
+                return polyArr[0];
+            case "B":
+                return polyArr[1];
+            case "C":
+                return polyArr[2];
+            case "R":
+                return polyArr[3];
+            default:
+                return null;
+        }
     }
 
 
@@ -183,7 +297,7 @@ public class polynomial implements IPolynomialSolver{
     }
 
     public int[][] getCoeffAndExpFromList(String strList){
-        int[] intList = SingleLinkedList.stringToIntArray(strList);
+        int[] intList = stringToIntArray(strList);
         int maxExponent = intList.length-1;
         int[][] output = new int[maxExponent+1][2];
         
@@ -332,7 +446,6 @@ public class polynomial implements IPolynomialSolver{
     @Override
     public int[][] multiply(polynomial p2) {
         int productSize = this.size() + p2.size() - 1;
-        int maxExponent = productSize-1;
         int[][] productArr = new int[productSize][2];
         
         int[] arrCoeff1 = new int[this.size()];
