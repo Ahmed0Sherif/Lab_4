@@ -2,22 +2,22 @@ import java.util.Arrays;
 import java.util.Scanner;
 
 // CLASS TO REPRESENT A SINGLE NODE
-    class Node {
-        int data;
-        Node next = null;
+class Node {
+    int data;
+    Node next = null;
 
-        //constructor
-        public Node() {
-            
-        }
-        public Node(int val) {
-            this.data = val;
-        }
-        public Node(int val, Node nextNode) {
-            this.data = val;
-            this.next = nextNode;
-        }
+    //constructor
+    public Node() {
+        
     }
+    public Node(int val) {
+        this.data = val;
+    }
+    public Node(int val, Node nextNode) {
+        this.data = val;
+        this.next = nextNode;
+    }
+}
 
 interface ILinkedList {
     /**
